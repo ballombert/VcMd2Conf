@@ -3,7 +3,7 @@
   "displayName": "VcMd2Conf — Markdown ↔ Confluence",
   "description": "Synchronize Markdown documentation with Confluence using mark CLI. Visual sync status, one-click publish, and version tracking.",
   "version": "0.1.0",
-  "publisher": "vcmd2conf",
+  "publisher": "ballombert",
   "icon": "resources/icons/confluence.png",
   "repository": {
     "type": "git",
