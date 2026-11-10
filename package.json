@@ -1,0 +1,324 @@
+{
+  "name": "vcmd2conf",
+  "displayName": "VcMd2Conf — Markdown ↔ Confluence",
+  "description": "Synchronize Markdown documentation with Confluence using mark CLI. Visual sync status, one-click publish, and version tracking.",
+  "version": "0.1.0",
+  "publisher": "vcmd2conf",
+  "icon": "resources/icons/confluence.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ballombert/VcMd2Conf.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "confluence",
+    "markdown",
+    "documentation",
+    "sync",
+    "mark",
+    "atlassian"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [
+    "workspaceContains:**/*.md"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vcmd2conf",
+          "title": "Confluence Sync",
+          "icon": "resources/icons/confluence.svg"
+        }
+      ]
+    },
+    "views": {
+      "vcmd2conf": [
+        {
+          "id": "vcmd2conf.syncView",
+          "name": "Documentation",
+          "icon": "resources/icons/confluence.svg",
+          "contextualTitle": "Confluence Sync"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "vcmd2conf.syncFile",
+        "title": "Sync to Confluence",
+        "icon": "$(cloud-upload)",
+        "category": "VcMd2Conf"
+      },
+      {
+        "command": "vcmd2conf.syncFolder",
+        "title": "Sync Folder to Confluence",
+        "icon": "$(cloud-upload)",
+        "category": "VcMd2Conf"
+      },
+      {
+        "command": "vcmd2conf.syncAll",
+        "title": "Sync All to Confluence",
+        "icon": "$(sync)",
+        "category": "VcMd2Conf"
+      },
+      {
+        "command": "vcmd2conf.refresh",
+        "title": "Refresh Sync Status",
+        "icon": "$(refresh)",
+        "category": "VcMd2Conf"
+      },
+      {
+        "command": "vcmd2conf.openInConfluence",
+        "title": "Open in Confluence",
+        "icon": "$(link-external)",
+        "category": "VcMd2Conf"
+      },
+      {
+        "command": "vcmd2conf.checkRemoteVersion",
+        "title": "Check Remote Version",
+        "icon": "$(git-compare)",
+        "category": "VcMd2Conf"
+      },
+      {
+        "command": "vcmd2conf.toggleViewMode",
+        "title": "Toggle View: Folder / Status",
+        "icon": "$(list-tree)",
+        "category": "VcMd2Conf"
+      },
+      {
+        "command": "vcmd2conf.configure",
+        "title": "Configure Confluence Connection",
+        "icon": "$(gear)",
+        "category": "VcMd2Conf"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "vcmd2conf.syncAll",
+          "when": "view == vcmd2conf.syncView",
+          "group": "navigation@1"
+        },
+        {
+          "command": "vcmd2conf.refresh",
+          "when": "view == vcmd2conf.syncView",
+          "group": "navigation@2"
+        },
+        {
+          "command": "vcmd2conf.toggleViewMode",
+          "when": "view == vcmd2conf.syncView",
+          "group": "navigation@3"
+        },
+        {
+          "command": "vcmd2conf.configure",
+          "when": "view == vcmd2conf.syncView",
+          "group": "navigation@4"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vcmd2conf.syncFile",
+          "when": "view == vcmd2conf.syncView && viewItem =~ /^mdFile/",
+          "group": "inline@1"
+        },
+        {
+          "command": "vcmd2conf.openInConfluence",
+          "when": "view == vcmd2conf.syncView && viewItem =~ /^mdFile\\.(synced|modified|error)/",
+          "group": "inline@2"
+        },
+        {
+          "command": "vcmd2conf.syncFile",
+          "when": "view == vcmd2conf.syncView && viewItem =~ /^mdFile/",
+          "group": "1_sync@1"
+        },
+        {
+          "command": "vcmd2conf.openInConfluence",
+          "when": "view == vcmd2conf.syncView && viewItem =~ /^mdFile\\.(synced|modified|error)/",
+          "group": "2_nav@1"
+        },
+        {
+          "command": "vcmd2conf.checkRemoteVersion",
+          "when": "view == vcmd2conf.syncView && viewItem =~ /^mdFile\\.(synced|modified)/",
+          "group": "2_nav@2"
+        },
+        {
+          "command": "vcmd2conf.syncFolder",
+          "when": "view == vcmd2conf.syncView && viewItem == folder",
+          "group": "inline@1"
+        },
+        {
+          "command": "vcmd2conf.syncFolder",
+          "when": "view == vcmd2conf.syncView && viewItem == folder",
+          "group": "1_sync@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "vcmd2conf.syncFile",
+          "when": "resourceExtname == .md",
+          "group": "vcmd2conf@1"
+        },
+        {
+          "command": "vcmd2conf.syncFolder",
+          "when": "explorerResourceIsFolder",
+          "group": "vcmd2conf@1"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "vcmd2conf.syncFile",
+          "when": "resourceExtname == .md",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "VcMd2Conf — Confluence Sync",
+      "properties": {
+        "vcmd2conf.markPath": {
+          "type": "string",
+          "default": "mark",
+          "description": "Path to the mark executable (https://github.com/kovetskiy/mark)"
+        },
+        "vcmd2conf.baseUrl": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Confluence base URL (e.g., `https://your-domain.atlassian.net/wiki`)"
+        },
+        "vcmd2conf.username": {
+          "type": "string",
+          "default": "",
+          "description": "Confluence Cloud email for Basic authentication. Leave empty for a Server/Data Center personal access token (Bearer)."
+        },
+        "vcmd2conf.apiToken": {
+          "type": "string",
+          "default": "",
+          "description": "Legacy token setting. Use VcMd2Conf: Configure Confluence Connection to save the token in VS Code SecretStorage.",
+          "deprecationMessage": "Use the configuration screen to move this token into VS Code SecretStorage."
+        },
+        "vcmd2conf.defaultSpace": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Default Confluence space key (e.g., `DOCS`)"
+        },
+        "vcmd2conf.markConfigPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Path to a mark config file (e.g., `ci.toml`). If set, mark will use this for authentication."
+        },
+        "vcmd2conf.markFeatures": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Comma-separated mark features to enable (e.g., `frontmatter,mermaid,mention`)"
+        },
+        "vcmd2conf.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh sync status when files change"
+        },
+        "vcmd2conf.autoRefreshInterval": {
+          "type": "number",
+          "default": 60,
+          "minimum": 10,
+          "description": "Interval (seconds) for periodic remote version checks"
+        },
+        "vcmd2conf.excludePatterns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/node_modules/**",
+            "**/.git/**",
+            "**/dist/**",
+            "**/out/**"
+          ],
+          "description": "Glob patterns to exclude from Markdown scanning"
+        },
+        "vcmd2conf.showNotifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show notification messages on sync success/failure"
+        }
+      }
+    },
+    "colors": [
+      {
+        "id": "vcmd2conf.synced",
+        "description": "Color for synced files (in tree view and decorations)",
+        "defaults": {
+          "dark": "#4EC9B0",
+          "light": "#16825D",
+          "highContrast": "#4EC9B0",
+          "highContrastLight": "#16825D"
+        }
+      },
+      {
+        "id": "vcmd2conf.modified",
+        "description": "Color for locally modified files that need re-sync",
+        "defaults": {
+          "dark": "#E2C08D",
+          "light": "#BF8803",
+          "highContrast": "#E2C08D",
+          "highContrastLight": "#BF8803"
+        }
+      },
+      {
+        "id": "vcmd2conf.notSynced",
+        "description": "Color for files never synced to Confluence",
+        "defaults": {
+          "dark": "#F14C4C",
+          "light": "#CD3131",
+          "highContrast": "#F14C4C",
+          "highContrastLight": "#CD3131"
+        }
+      },
+      {
+        "id": "vcmd2conf.noMetadata",
+        "description": "Color for Markdown files without mark metadata",
+        "defaults": {
+          "dark": "#6A6A6A",
+          "light": "#A0A0A0",
+          "highContrast": "#6A6A6A",
+          "highContrastLight": "#A0A0A0"
+        }
+      },
+      {
+        "id": "vcmd2conf.syncing",
+        "description": "Color for files currently being synced",
+        "defaults": {
+          "dark": "#569CD6",
+          "light": "#0078D4",
+          "highContrast": "#569CD6",
+          "highContrastLight": "#0078D4"
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.cjs",
+    "build": "node esbuild.js --production",
+    "watch": "node esbuild.js --watch",
+    "lint": "eslint src --ext ts",
+    "package": "npx @vscode/vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.3.0"
+  },
+  "allowScripts": {
+    "esbuild@0.24.2": true,
+    "@vscode/vsce-sign@2.1.0": true
+  }
+}
